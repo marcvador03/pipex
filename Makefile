@@ -1,81 +1,124 @@
 #Directory definition
-LIBFT_DIR := libft
-SRC_DIR := src
-OBJ_DIR := obj
-INC_DIR := include
-LIB_DIR := lib
+TARGET_LIB ?=
+
+TARGET_INC :=
 
 #Filenames definition
-NAME := push_swap
+NAME := libft.a
 
-SRC_NAMES := push_swap.c \
-			 push_swap_stack_utils.c \
-			 push_swap_utils.c \
-			 push_swap_operations.c \
-			 push_swap_algo_utils.c \
-			 push_swap_search.c \
-			 push_swap_parse_checks.c \
-			 three_five_sort.c \
-			 turk_sort.c \
-			 cost_calculations.c
+SRC_NAMES := ft_isalpha.c \
+	     ft_isascii.c \
+	     ft_isdigit.c \
+	     ft_isalnum.c \
+	     ft_isprint.c \
+	     ft_memset.c \
+	     ft_strlen.c \
+	     ft_bzero.c \
+	     ft_memcpy.c \
+	     ft_memmove.c \
+	     ft_strlcpy.c \
+	     ft_strlcat.c \
+	     ft_toupper.c \
+	     ft_tolower.c \
+	     ft_strchr.c \
+	     ft_strrchr.c \
+	     ft_strncmp.c \
+	     ft_memchr.c \
+	     ft_memcmp.c \
+	     ft_strnstr.c \
+	     ft_atoi.c \
+	     ft_calloc.c \
+	     ft_strdup.c \
+	     ft_substr.c \
+	     ft_strjoin.c \
+	     ft_strtrim.c \
+	     ft_split.c \
+	     ft_itoa.c \
+	     ft_strmapi.c \
+	     ft_striteri.c \
+	     ft_putchar_fd.c \
+	     ft_putstr_fd.c \
+	     ft_putendl_fd.c \
+	     ft_putnbr_fd.c \
+		 ft_lstnew.c \
+		 ft_lstadd_front.c \
+		 ft_lstsize.c \
+		 ft_lstlast.c \
+		 ft_lstadd_back.c \
+		 ft_lstdelone.c \
+		 ft_lstclear.c \
+		 ft_lstiter.c \
+		 ft_lstmap.c
 
-INC_NAMES := push_swap.h
+FT_PRINTF_NAMES := ft_printf.c \
+				   ft_printf_char.c \
+				   ft_printf_dec.c \
+				   ft_printf_hexa.c \
+				   ft_printf_string.c \
+				   ft_printf_unsigned.c \
+				   ft_printf_utils.c
 
-SOURCES := $(patsubst %.c, $(SRC_DIR)/%.c, $(SRC_NAMES))
+GNL_NAMES := get_next_line.c \
+			 get_next_line_utils.c 
 
-OBJECTS := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SOURCES))
+INC_NAMES := libft.h \
+			 ft_printf/ft_printf.h \
+			 getnextline/get_next_line.h
 
-INCLUDES := $(patsubst %.h, $(INC_DIR)/%.h, $(INC_NAMES))
+SOURCES := $(patsubst %.c, %.c, $(SRC_NAMES))
+FT_PRINTF_SOURCES := $(patsubst %.c, ft_printf/%.c, $(FT_PRINTF_NAMES))
+GNL_SOURCES := $(patsubst %.c, getnextline/%.c, $(GNL_NAMES))
+
+OBJECTS := $(patsubst %.c, %.o, $(SOURCES))
+OBJECTS += $(patsubst %.c, %.o, $(FT_PRINTF_SOURCES))
+OBJECTS += $(patsubst %.c, %.o, $(GNL_SOURCES))
 
 DEPS := $(OBJECTS:.o=.d)
 
 CFLAGS += -Wall -Werror -Wextra -MMD -MP
-
-LIB_NAMES := libft.a 
-LIBS_TAG := $(patsubst lib%.a, -l%, $(LIB_NAMES)) 
-
 DEBUG ?=
 
 CUR_DIR := $(shell pwd)
 
 #TARGETS
-all: libft $(OBJECTS) $(NAME) 
+all: $(OBJECTS) $(NAME) 
 
-$(NAME): libft/libft.a Makefile $(INCLUDES) $(OBJECTS)
-	cc $(CFLAGS) -L libft $(DEBUG) $(OBJECTS) -o $@ $(LIBS_TAG) $(LIBS_TAG)
+install: $(NAME)
+ifneq ($(TARGET_LIB),)	
+	@install -d $(TARGET_LIB)
+	@install -m 644 $< $(TARGET_LIB)
+#	@echo $< "Copied"
+endif
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	cc $(CFLAGS) $(DEBUG) -c $< -o $@ 
+$(NAME): $(OBJECTS) 
+	ar rc $(NAME) $(OBJECTS)
+	@ranlib $(NAME)
 
-libft: | $(LIB_DIR) $(INC_DIR) 
-	@$(MAKE) -C $(LIBFT_DIR)
+%.o: %.c libft.h ft_printf/ft_printf.h getnextline/get_next_line.h Makefile 
+	cc $(CFLAGS) $(DEBUG) -c $< -o $@
 
-$(OBJ_DIR):
-	@mkdir $(OBJ_DIR)
+$(TARGET_LIB):
+	mkdir $(TARGET_LIB)
 
-$(LIB_DIR):
-	@mkdir $(LIB_DIR)
-
-$(INC_DIR):
-	@mkdir $(INC_DIR)
+$(TARGET_INC):
+	mkdir $(TARGET_INC)
 
 flags:
 	@echo $(CFLAGS)
 
 show:
-	@echo $(SOURCES)
+	@echo $(INC_BASENAMES)
+	@echo $(INC_TEST)
+#	@echo $(TARGET_LIB)/libft.a
 
 clean: 
-	@$(MAKE) clean -C $(LIBFT_DIR)
-	@rm -rf $(OBJ_DIR)
+	@rm -rf $(OBJECTS) $(DEPS)
 
 fclean: clean
 	@rm -rf $(NAME)
-	@$(MAKE) fclean -C $(LIBFT_DIR)
-	@rm -rf $(LIB_DIR)/*
 
 re: fclean all
 ifneq ($(DEPS), )
 -include $(DEPS)
 endif
-.PHONY: all flags clean fclean re show libft bonus
+.PHONY: all flags clean fclean re show install
