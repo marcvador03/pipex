@@ -1,31 +1,14 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   errors.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mfleury <mfleury@student.42barcelona.      +#+  +:+       +#+        */
+/*   By: mfleury <mfleury@student.42barcelona.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/04 12:55:43 by mfleury           #+#    #+#             */
+/*   Created: 2024/10/05 16:07:40 by mfleury           #+#    #+#             */
 /*   Updated: 2024/10/05 17:27:53 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/pipex.h"
-
-void	exit_error(char *str)
-{
-	perror(str);
-	exit(-1);
-}
-
-int	main (int argc, char *argv[])
-{
-	int	fd;
-
-	if (argc != 5)
-		exit_error(ERR_ARG_NUM);
-	return (0);
-	fd = open(argv[1], O_RDONLY);
-	if (fd == -1)
-		exit_error(ERR_OPEN_FILE)
-}
+#define ERR_ARG_NUM "Incorrect number of arguments"
+#define ERR_OPEN_FILE "Error while opening file"
