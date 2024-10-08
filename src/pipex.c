@@ -6,7 +6,7 @@
 /*   By: mfleury <mfleury@student.42barcelona.      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 12:55:43 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/07 19:54:09 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/08 19:19:04 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,45 @@ void	exit_error(char *str)
 	exit(-1);
 }
 
+void	create_child(int *p_fd, char *argv[], char *envp[])
+{
+	char	**args;
+	int		fd;
+
+	fd = open(argv[1], O_RDONLY);
+	if (fd == -1)
+		exit_error(ERR_OPEN_FILE);
+	dup2(fd, 0);
+	dup2(p_fd[1], 1);
+	close(p_fd[0]);
+	args = ft_split(argv[2] ,' ');
+	if (args == NULL)
+		exit_error(ERR_MALLOC);
+	if (execve(args[0], args, envp) == -1)
+		exit_error(ERR_EXEC);	
+}
+
+void	create_parent(int *p_fd, char *argv[], char *envp[])
+{
+	int		fd;
+	char	**args;
+
+	fd = open(argv[4], O_WRONLY);
+	if (fd == -1)
+		exit_error(ERR_OPEN_FILE);
+	dup2(fd, 1);
+	dup2(p_fd[0], 0);
+	close(p_fd[1]);
+	args = ft_split(argv[3] ,' ');
+	if (args == NULL)
+		exit_error(ERR_MALLOC);
+	if (execve(args[0], args, envp) == -1)
+		exit_error(ERR_EXEC);	
+}
+
 void	check_files(char *path1, char *path2)
 {
-	int	fd[2];
+	int		fd[2];
 
 	fd[0] = access(path1, F_OK);
 	fd[1]= access(path1, F_OK);
@@ -32,47 +68,23 @@ void	check_files(char *path1, char *path2)
 		exit_error(ERR_FILE_PERM);
 }
 
-int	main (int argc, char *argv[]/*, char *envp[]*/)
+int	main (int argc, char *argv[], char *envp[])
 {
 	int		p_fd[2];
-	int		fd[2];
 	pid_t	pid;
-	char	buf;
-	char	**args;
-	//char*str;
 
-	if (argc < 0) // back to 5
+	if (argc != 5) // back to 5
 		exit_error(ERR_ARG_NUM);
 	check_files(argv[1], argv[1]);	// update 2nd arg
-	fd[0] = open(argv[1], O_RDONLY);
 	//fd[1] = open(argv[2], O_WRONLY);
 	if (pipe(p_fd) == -1)
 		exit_error(ERR_PIPE_CREA);
 	pid = fork();
 	if (pid == -1)
 		exit_error(ERR_FORK_CREA);
-	dup2(fd[0], p_fd[0]);
 	if (pid == 0)
-	{
-		close(p_fd[1]);
-		args = ft_split(argv[2] ,' ');
-		if (args == NULL)
-			exit_error(ERR_MALLOC);
-		while (read(p_fd[0], &buf, 1) != 0)
-		{
-			write(STDOUT_FILENO, &buf, 1);
-			execve(args[0], args, NULL);	
-		}
-	close(p_fd[0]);
-	exit(0);
-	}
+		create_child(p_fd, argv, envp);
 	else
-	{
-		close(p_fd[0]);
-		write(p_fd[1], argv[1], ft_strlen(argv[1]));
-		close(p_fd[1]);
-		wait(0);
-		exit(0);
-	}
+		create_parent(p_fd, argv, envp);
 	return (0);
 }
