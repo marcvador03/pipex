@@ -6,25 +6,36 @@
 /*   By: mfleury <mfleury@student.42barcelona.      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 12:55:43 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/09 10:50:03 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/10 00:32:12 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
 
-void	exec_cmd(char argv[], char *envp[])
+void	exec_cmd(char *argv, char *envp[])
 {
 	char	**args;
 	char	*cmd;
-	
-	args = ft_split(argv ,' ');
+
+	args = ft_split(argv, ' ');
 	if (args == NULL)
 		exit_error(ERR_MALLOC);
 	cmd = args[0];
 	if (access(cmd, F_OK) == -1)
+	{
 		cmd = get_cmd(args[0], envp);
+		if (cmd == NULL)
+		{
+			free_split(args);
+			exit_error(ERR_MALLOC);
+		}
+	}
 	if (execve(cmd, args, envp) == -1)
-		exit_error(ERR_EXEC);	
+	{
+		free_split(args);
+		exit_error(ERR_EXEC);
+	}
+	free_split(args);
 }
 
 void	create_child(int *p_fd, char *argv[], char *envp[])
@@ -44,7 +55,7 @@ void	create_parent(int *p_fd, char *argv[], char *envp[])
 {
 	int		fd;
 
-	fd = open(argv[4], O_WRONLY);
+	fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd == -1)
 		exit_error(ERR_OPEN_FILE);
 	dup2(fd, 1);
@@ -53,14 +64,15 @@ void	create_parent(int *p_fd, char *argv[], char *envp[])
 	exec_cmd(argv[3], envp);
 }
 
-int	main (int argc, char *argv[], char *envp[])
+int	main(int argc, char *argv[], char *envp[])
 {
 	int		p_fd[2];
 	pid_t	pid;
 
-	if (argc != 5) // back to 5
+	errno = 0;
+	if (argc != 5)
 		exit_error(ERR_ARG_NUM);
-	check_files(argv[1], argv[4]);	// update 2nd arg
+	check_files(argv[1]);
 	if (pipe(p_fd) == -1)
 		exit_error(ERR_PIPE_CREA);
 	pid = fork();
@@ -70,5 +82,5 @@ int	main (int argc, char *argv[], char *envp[])
 		create_child(p_fd, argv, envp);
 	else
 		create_parent(p_fd, argv, envp);
-	return (0);
+	exit(EXIT_SUCCESS);
 }
