@@ -6,16 +6,31 @@
 /*   By: mfleury <mfleury@student.42barcelona.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 09:22:58 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/09 10:45:16 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/10 00:32:12 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
 
+void	free_split(char **ptr)
+{
+	int	i;
+
+	if (ptr == NULL)
+		return ;
+	i = 0;
+	while (ptr[i] != NULL)
+		free(ptr[i++]);
+	free(ptr);
+}
+
 void	exit_error(char *str)
 {
-	perror(str);
-	exit(-1);
+	if (errno == 0)
+		ft_printf("Error encountered: %s\n", str);
+	else
+		strerror(errno);
+	exit(EXIT_FAILURE);
 }
 
 char	**search_path(char *envp[])
@@ -28,17 +43,13 @@ char	**search_path(char *envp[])
 	while (envp[i] != NULL)
 	{
 		if (ft_strncmp(envp[i], "PATH=", 5) == 0 && ft_strlen(envp[i]) > 5)
-		{
 			res = ft_split(envp[i] + 5, ':');
-			if (res == NULL)
-				exit_error(ERR_MALLOC);
-		}
 		i++;
 	}
 	return (res);
 }
 
-char	*get_cmd(char *cmd, char *envp[])
+char	*get_cmd(char *args, char *envp[])
 {
 	char	*cmd_in;
 	char	*cmd_out;
@@ -46,33 +57,33 @@ char	*get_cmd(char *cmd, char *envp[])
 	int		i;
 
 	paths = search_path(envp);
-	cmd_in = ft_strjoin("/", cmd);
+	if (paths == NULL)
+		return (NULL);
+	cmd_in = ft_strjoin("/", args);
 	if (cmd_in == NULL)
-		exit_error(ERR_MALLOC);
+		return (free_split(paths), NULL);
 	i = 0;
 	while (paths[i] != NULL)
 	{
 		cmd_out = ft_strjoin(paths[i], cmd_in);
 		if (cmd_out == NULL)
-			exit_error(ERR_MALLOC);
-		if (access(cmd_out, F_OK) == 0)	
-			return (free(paths), free(cmd_in), cmd_out);
+			return (free_split(paths), free(cmd_in), NULL);
+		if (access(cmd_out, F_OK) == 0)
+			return (free_split(paths), free(cmd_in), cmd_out);
 		i++;
+		free(cmd_out);
 	}
-	return (free(paths), free(cmd_in), NULL);
-	
+	return (free_split(paths), free(cmd_in), NULL);
 }
 
-void	check_files(char *path1, char *path2)
+void	check_files(char *path1)
 {
 	int		fd[2];
 
 	fd[0] = access(path1, F_OK);
-	fd[1]= access(path1, F_OK);
-	if (fd[0] == -1  || fd[1] == -1)
+	if (fd[0] == -1)
 		exit_error(ERR_MISSING_FILE);
 	fd[0] = access(path1, R_OK);
-	fd[1]= access(path2, R_OK & W_OK);
-	if (fd[0] == -1  || fd[1] == -1)
+	if (fd[0] == -1)
 		exit_error(ERR_FILE_PERM);
 }
