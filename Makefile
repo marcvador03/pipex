@@ -8,7 +8,8 @@ LIB_DIR := lib
 #Filenames definition
 NAME := pipex
 
-SRC_NAMES := pipex.c
+SRC_NAMES := pipex.c \
+			 pipex_utils.c
 
 INC_NAMES := pipex.h
 

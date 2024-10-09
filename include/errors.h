@@ -6,7 +6,7 @@
 /*   By: mfleury <mfleury@student.42barcelona.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/05 16:07:40 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/08 19:08:02 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/09 10:25:31 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,3 +18,4 @@
 #define ERR_FORK_CREA "Error during fork creation"
 #define ERR_MALLOC "Error during malloc"
 #define ERR_EXEC "Error during command execution"
+#define ERR_NO_CMD "No command path found"

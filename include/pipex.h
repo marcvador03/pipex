@@ -6,7 +6,7 @@
 /*   By: mfleury <mfleury@student.42barcelona.      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 12:55:02 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/05 17:26:41 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/09 10:36:13 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,9 @@
 # include "../libft/libft.h"
 # include "errors.h"
 # include "../libft/ft_printf/ft_printf.h"
+
+void	exit_error(char *str);
+void	check_files(char *path1, char *path2);
+char	*get_cmd(char *cmd_in, char *envp[]);
+
 #endif
