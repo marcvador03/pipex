@@ -6,7 +6,7 @@
 /*   By: mfleury <mfleury@student.42barcelona.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 09:22:58 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/10 00:32:12 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/11 11:52:27 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,11 @@ void	free_split(char **ptr)
 	free(ptr);
 }
 
-void	exit_error(char *str)
+void	exit_error(char *str, int err)
 {
-	if (errno == 0)
-		ft_printf("Error encountered: %s\n", str);
-	else
-		strerror(errno);
+	if (err != 0)
+		errno = err;
+	perror(str);
 	exit(EXIT_FAILURE);
 }
 
@@ -82,8 +81,8 @@ void	check_files(char *path1)
 
 	fd[0] = access(path1, F_OK);
 	if (fd[0] == -1)
-		exit_error(ERR_MISSING_FILE);
+		exit_error(ERR_MISSING_FILE, 0);
 	fd[0] = access(path1, R_OK);
 	if (fd[0] == -1)
-		exit_error(ERR_FILE_PERM);
+		exit_error(ERR_FILE_PERM, 0);
 }
