@@ -6,7 +6,7 @@
 /*   By: mfleury <mfleury@student.42barcelona.      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 12:55:43 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/11 12:01:50 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/11 12:05:40 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	create_child_out(int *p_fd, char *argv[], char *envp[])
 {
 	int		fd;
 
-	fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0755);
+	fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		exit_error(ERR_OPEN_FILE, 0);
 	dup2(fd, 1);
