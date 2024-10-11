@@ -6,7 +6,7 @@
 /*   By: mfleury <mfleury@student.42barcelona.      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 12:55:43 by mfleury           #+#    #+#             */
-/*   Updated: 2024/10/11 11:55:17 by mfleury          ###   ########.fr       */
+/*   Updated: 2024/10/11 12:01:50 by mfleury          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	exec_cmd(char *argv, char *envp[])
 	return (0);
 }
 
-void	create_child(int *p_fd, char *argv[], char *envp[])
+void	create_child_in(int *p_fd, char *argv[], char *envp[])
 {
 	int		fd;
 
@@ -49,7 +49,7 @@ void	create_child(int *p_fd, char *argv[], char *envp[])
 	close(fd);
 }
 
-void	create_child2(int *p_fd, char *argv[], char *envp[])
+void	create_child_out(int *p_fd, char *argv[], char *envp[])
 {
 	int		fd;
 
@@ -81,12 +81,12 @@ int	main(int argc, char *argv[], char *envp[])
 	if (pid[0] == -1)
 		exit_error(ERR_FORK_CREA, 0);
 	if (pid[0] == 0)
-		create_child(p_fd, argv, envp);
+		create_child_in(p_fd, argv, envp);
 	pid[1] = fork();
 	if (pid[1] == -1)
 		exit_error(ERR_FORK_CREA, 0);
 	if (pid[1] == 0)
-		create_child2(p_fd, argv, envp);
+		create_child_out(p_fd, argv, envp);
 	if (waitpid(0, &wstatus, 0) == -1)
 		exit_error(ERR_WAITPID, 0);
 	if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == 1)
