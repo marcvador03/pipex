@@ -13,6 +13,7 @@ launch in your terminal "./pipex" with four (4) arguments containing (i) input f
 "make re" does a "make fclean" followed by a "make" to regenerate all files.
 
 **Dependencies**
+
 My own library "Libft" which was developed as part of the school to mimic C standard functions is shipped with this project. We are restricted by the school in the external functions we can use for each project, but allowed to use our own functions and library such as Libft.
 
 *Tested on Linux Debian Trixie and Ubuntu*
